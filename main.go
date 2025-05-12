@@ -10,6 +10,14 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+type ProductValidator struct {
+	validator *validator.Validate
+}
+
+func (p *ProductValidator) Validate(i interface{}) error {
+	return p.validator.Struct(i)
+}
+
 func main() {
 	port := os.Getenv("MY_APP_PORT")
 	if port == "" {
@@ -27,7 +35,7 @@ func main() {
 		return c.JSON(http.StatusOK, products)
 	})
 
-	e.GET("/products/:vendor", func(c echo.Context) error {
+	e.GET("/products/:id", func(c echo.Context) error {
 		var product map[int]string
 		for _, p := range products {
 			for k := range p {
@@ -54,11 +62,12 @@ func main() {
 		}
 
 		var reqBody body
+		e.Validator = &ProductValidator{validator: v}
 		if err := c.Bind(&reqBody); err != nil {
 			return err
 		}
 
-		if err := v.Struct(reqBody); err != nil {
+		if err := c.Validate(reqBody); err != nil {
 			return err
 		}
 
