@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 func main() {
@@ -15,7 +16,8 @@ func main() {
 		port = "8080"
 	}
 	e := echo.New()
-	products := []map[int]string{{1: "mobiles"}, {2: "tv"}}
+	v := validator.New()
+	products := []map[int]string{{1: "mobiles"}, {2: "tv"}, {3: "laptops"}}
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Well , hello there !!!")
@@ -25,7 +27,7 @@ func main() {
 		return c.JSON(http.StatusOK, products)
 	})
 
-	e.GET("/products/:id", func(c echo.Context) error {
+	e.GET("/products/:vendor", func(c echo.Context) error {
 		var product map[int]string
 		for _, p := range products {
 			for k := range p {
@@ -46,11 +48,17 @@ func main() {
 
 	e.POST("/products", func(c echo.Context) error {
 		type body struct {
-			Name string `json:"product_name"`
+			Name string `json:"product_name" validate :"required,min=4"`
+			// Vendor  string `json:"vendor" validate :"min=3,max=15"`
+			// Country string `json:"country" validate :"len=2"`
 		}
 
 		var reqBody body
 		if err := c.Bind(&reqBody); err != nil {
+			return err
+		}
+
+		if err := v.Struct(reqBody); err != nil {
 			return err
 		}
 
