@@ -2,7 +2,6 @@ package tronics
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
@@ -20,12 +19,21 @@ func init() {
 	}
 }
 
-func Start() {
-	port := os.Getenv("MY_APP_PORT")
-	if port == "" {
-		port = "8080"
+func serverMessage(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		fmt.Println("inside middleware")
+		return next(c)
 	}
+}
 
+func serverMessageDo(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		fmt.Println("inside middleware Do")
+		return next(c)
+	}
+}
+
+func Start() {
 	e.GET("/products", getProducts)
 	e.GET("/products/:id", getProduct)
 	e.POST("/products", createProduct)
