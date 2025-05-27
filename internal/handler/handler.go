@@ -30,10 +30,10 @@ func GetProduct(c echo.Context) error {
 func CreateProduct(c echo.Context) error {
 	var req dto.CreateProductRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
+		return errors.Respond(c, errors.NewBadRequest("Invalid input"), "Invalid input")
 	}
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+		return errors.Respond(c, errors.NewBadRequest(err.Error()), err.Error())
 	}
 
 	product := mapper.ToProduct(req)
@@ -51,15 +51,15 @@ func CreateProduct(c echo.Context) error {
 func UpdateProduct(c echo.Context) error {
 	var req dto.UpdateProductRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
+		return errors.Respond(c, errors.NewBadRequest("Invalid input"), "Invalid input")
 	}
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+		return errors.Respond(c, errors.NewBadRequest(err.Error()), err.Error())
 	}
 
 	updateData := mapper.ToUpdateMapFromUpdateRequest(req)
 	if len(updateData) == 0 {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Nothing to update"})
+		return errors.Respond(c, errors.NewBadRequest("Nothing to update"), "Nothing to update")
 	}
 
 	id := c.Param("id")
@@ -92,16 +92,16 @@ func DeleteProduct(c echo.Context) error {
 func PatchProduct(c echo.Context) error {
 	var req dto.PatchProductRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid body"})
+		return errors.Respond(c, errors.NewBadRequest("Invalid body"), "Invalid body")
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+		return errors.Respond(c, errors.NewBadRequest(err.Error()), err.Error())
 	}
 
 	updateData := mapper.ToPatchMap(req)
 	if len(updateData) == 0 {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Nothing to patch"})
+		return errors.Respond(c, errors.NewBadRequest("Nothing to patch"), "Nothing to patch")
 	}
 
 	id := c.Param("id")

@@ -12,6 +12,14 @@ import (
 
 var collection = config.GetMongoClient().Database("tronicsdb").Collection("products")
 
+func parseObjectID(id string) (primitive.ObjectID, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return primitive.NilObjectID, errors.NewBadRequest("Invalid product ID format")
+	}
+	return objID, nil
+}
+
 func GetAllProducts() ([]model.Product, error) {
 	cursor, err := collection.Find(context.TODO(), bson.M{})
 	if err != nil {
@@ -95,12 +103,4 @@ func PatchProduct(id string, fields map[string]interface{}) error {
 	}
 
 	return nil
-}
-
-func parseObjectID(id string) (primitive.ObjectID, error) {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return primitive.NilObjectID, errors.NewBadRequest("Invalid product ID format")
-	}
-	return objID, nil
 }
