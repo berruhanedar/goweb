@@ -1,7 +1,7 @@
 package main
 
-import "github.com/berruhanedar/goweb/tronics"
+import "github.com/berruhanedar/goweb/app"
 
 func main() {
-	tronics.Start()
+	app.Start()
 }
